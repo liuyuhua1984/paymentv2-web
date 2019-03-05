@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.payment.v2.web.mapper.AccountStatementMapper">
+	<resultMap type="cn.com.payment.v2.web.model.AccountStatement" id="accountStatementResultMap">
+		<id column="pas_adjustId" jdbcType="BIGINT" property="adjustId" />
+		<result column="pas_operatorId" jdbcType="BIGINT" property="operatorId" />
+		<result column="pas_accountId" jdbcType="BIGINT" property="accountId" />
+		<result column="pas_subAccType" jdbcType="VARCHAR" property="subAccType" />
+		<result column="pas_financialType" jdbcType="VARCHAR" property="financialType" />
+		<result column="pas_adjustType" jdbcType="VARCHAR" property="adjustType" />
+		<result column="pas_beforBalance" jdbcType="BIGINT" property="beforBalance" />
+		<result column="pas_afterBalance" jdbcType="BIGINT" property="afterBalance" />
+		<result column="pas_adjustAmount" jdbcType="BIGINT" property="adjustAmount" />
+		<result column="pas_state" jdbcType="VARCHAR" property="state" />
+		<result column="pas_remark" jdbcType="VARCHAR" property="remark" />
+		<result column="pas_createTime" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="pas_updateTime" jdbcType="TIMESTAMP" property="updateTime" />
+	</resultMap>
+	
+	<insert id="save" parameterType="AccountStatement" useGeneratedKeys="true" keyProperty="adjustId">
+	  INSERT INTO pay_account_statement
+	  (pas_operatorId,pas_accountId,pas_subAccType,pas_financialType,pas_adjustType,pas_beforBalance,pas_afterBalance,pas_adjustAmount,pas_state,pas_remark,pas_createTime,pas_updateTime)
+	  VALUES 
+	  (#{operatorId},#{accountId},#{subAccType},#{financialType},#{adjustType},#{beforBalance},#{afterBalance},#{adjustAmount},#{state},#{remark},#{createTime},#{updateTime})
+	</insert>
+
+	<insert id="insertBatch" parameterType="AccountStatement">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO
+		pay_account_statement
+		(pas_operatorId,pas_accountId,pas_subAccType,pas_financialType,pas_adjustType,pas_beforBalance,pas_afterBalance,pas_adjustAmount,pas_state,pas_remark,pas_createTime,pas_updateTime)
+		SELECT *
+		FROM (
+		<foreach collection="list" item="accountStatement" index="index"
+			open="" close="" separator="union all">
+			SELECT
+					 #{operatorId} as pas_operatorId,
+					 #{accountId} as pas_accountId,
+					 #{subAccType} as pas_subAccType,
+					 #{financialType} as pas_financialType,
+					 #{adjustType} as pas_adjustType,
+					 #{beforBalance} as pas_beforBalance,
+					 #{afterBalance} as pas_afterBalance,
+					 #{adjustAmount} as pas_adjustAmount,
+					 #{state} as pas_state,
+					 #{remark} as pas_remark,
+					 #{createTime} as pas_createTime,
+					 #{updateTime} as pas_updateTime
+			FROM DUAL
+		</foreach>
+		) A
+	</insert>
+
+	
+	<update id="update" parameterType="AccountStatement">
+		UPDATE pay_account_statement
+		<set>
+		  <if test="adjustId !=null and adjustId >= 0 "> 
+			 pas_adjustId = #{adjustId},
+	      </if>
+		  <if test="operatorId !=null and operatorId >= 0 "> 
+			 pas_operatorId = #{operatorId},
+	      </if>
+		  <if test="accountId !=null and accountId >= 0 "> 
+			 pas_accountId = #{accountId},
+	      </if>
+		  <if test="subAccType !=null and subAccType!='' ">
+			 pas_subAccType=#{subAccType},  
+		  </if> 
+		  <if test="financialType !=null and financialType!='' ">
+			 pas_financialType=#{financialType},  
+		  </if> 
+		  <if test="adjustType !=null and adjustType!='' ">
+			 pas_adjustType=#{adjustType},  
+		  </if> 
+		  <if test="beforBalance !=null and beforBalance >= 0 "> 
+			 pas_beforBalance = #{beforBalance},
+	      </if>
+		  <if test="afterBalance !=null and afterBalance >= 0 "> 
+			 pas_afterBalance = #{afterBalance},
+	      </if>
+		  <if test="adjustAmount !=null and adjustAmount >= 0 "> 
+			 pas_adjustAmount = #{adjustAmount},
+	      </if>
+		  <if test="state !=null and state!='' ">
+			 pas_state=#{state},  
+		  </if> 
+		  <if test="remark !=null and remark!='' ">
+			 pas_remark=#{remark},  
+		  </if> 
+		  <if test="createTime !=null and createTime!='' ">
+			 pas_createTime=#{createTime},  
+		  </if> 
+		  <if test="updateTime !=null and updateTime!='' ">
+			 pas_updateTime=#{updateTime}  
+		  </if> 
+		</set>
+		WHERE pas_adjustId = #{adjustId}
+	</update>
+
+	<delete id="deleteByPK">
+		DELETE FROM pay_account_statement WHERE pas_adjustId = #{adjustId}
+	</delete>
+
+
+	<delete id="deleteByPKs" parameterType="java.util.ArrayList">
+	  DELETE FROM pay_account_statement WHERE pas_adjustId IN
+		<foreach collection="array" item="adjustId" open="(" separator="," close=")">
+			 #{adjustId}
+		</foreach>
+	</delete>
+	
+	<delete id="delete" parameterType="AccountStatement"> 
+		DELETE FROM pay_account_statement WHERE pas_adjustId = #{adjustId}
+	</delete>
+	
+	<select id="exists" parameterType="java.lang.Long" resultType="boolean">
+		select count(*) from pay_account_statement where pas_adjustId = #{adjustId}
+	</select>
+	
+	<select id="selectOne" parameterType="java.lang.Long" resultMap="accountStatementResultMap">
+		select * from pay_account_statement
+		where pas_adjustId = #{adjustId}
+	</select>
+	
+	<select id="selectAll" resultMap="accountStatementResultMap">
+		select * from pay_account_statement
+	</select>
+	
+	<select id="selectByPKs" parameterType="java.util.ArrayList" resultMap="accountStatementResultMap">
+		select * from pay_account_statement
+		where pas_adjustId in
+		<foreach collection="array" item="adjustId" open="(" separator="," close=")">
+			 #{adjustId}
+		</foreach>
+	</select>
+	
+	<select id="selectByProperty" parameterType="AccountStatement" resultMap="accountStatementResultMap">
+	  SELECT * FROM pay_account_statement 
+		<where>
+		  <if test="adjustId !=null and adjustId >= 0 ">
+			 pas_adjustId=#{adjustId}  
+		  </if> 
+		  <if test="operatorId !=null and operatorId >= 0 ">
+			AND pas_operatorId=#{operatorId} 
+		  </if> 
+		  <if test="accountId !=null and accountId >= 0 ">
+			AND pas_accountId=#{accountId} 
+		  </if> 
+	      <if test="subAccType !=null and subAccType!='' ">
+			AND pas_subAccType=#{subAccType}  
+		  </if> 
+	      <if test="financialType !=null and financialType!='' ">
+			AND pas_financialType=#{financialType}  
+		  </if> 
+	      <if test="adjustType !=null and adjustType!='' ">
+			AND pas_adjustType=#{adjustType}  
+		  </if> 
+		  <if test="beforBalance !=null and beforBalance >= 0 ">
+			AND pas_beforBalance=#{beforBalance} 
+		  </if> 
+		  <if test="afterBalance !=null and afterBalance >= 0 ">
+			AND pas_afterBalance=#{afterBalance} 
+		  </if> 
+		  <if test="adjustAmount !=null and adjustAmount >= 0 ">
+			AND pas_adjustAmount=#{adjustAmount} 
+		  </if> 
+	      <if test="state !=null and state!='' ">
+			AND pas_state=#{state}  
+		  </if> 
+	      <if test="remark !=null and remark!='' ">
+			AND pas_remark=#{remark}  
+		  </if> 
+	      <if test="createTime !=null and createTime!='' ">
+			AND pas_createTime=#{createTime}  
+		  </if> 
+	      <if test="updateTime !=null and updateTime!='' ">
+			AND pas_updateTime=#{updateTime}  
+		  </if> 
+		</where>
+	</select>
+	<select id="selectByPropertyKeyWord" parameterType="AccountStatement" resultMap="accountStatementResultMap">
+	  SELECT * FROM pay_account_statement 
+		<where>
+		  <if test="adjustId !=null and adjustId >= 0 ">
+			 pas_adjustId=#{adjustId}  
+		  </if> 
+		  <if test="operatorId !=null and operatorId >= 0 ">
+			AND pas_operatorId=#{operatorId} 
+		  </if> 
+		  <if test="accountId !=null and accountId >= 0 ">
+			AND pas_accountId=#{accountId} 
+		  </if> 
+	      <if test="subAccType !=null and subAccType!='' ">
+			AND pas_subAccType=#{subAccType}  
+		  </if> 
+	      <if test="financialType !=null and financialType!='' ">
+			AND pas_financialType=#{financialType}  
+		  </if> 
+	      <if test="adjustType !=null and adjustType!='' ">
+			AND pas_adjustType=#{adjustType}  
+		  </if> 
+		  <if test="beforBalance !=null and beforBalance >= 0 ">
+			AND pas_beforBalance=#{beforBalance} 
+		  </if> 
+		  <if test="afterBalance !=null and afterBalance >= 0 ">
+			AND pas_afterBalance=#{afterBalance} 
+		  </if> 
+		  <if test="adjustAmount !=null and adjustAmount >= 0 ">
+			AND pas_adjustAmount=#{adjustAmount} 
+		  </if> 
+	      <if test="state !=null and state!='' ">
+			AND pas_state=#{state}  
+		  </if> 
+	      <if test="remark !=null and remark!='' ">
+			AND pas_remark=#{remark}  
+		  </if> 
+	      <if test="createTime !=null and createTime!='' ">
+			AND pas_createTime=#{createTime}  
+		  </if> 
+	      <if test="updateTime !=null and updateTime!='' ">
+			AND pas_updateTime=#{updateTime}  
+		  </if> 
+		  <if test="keyWord !=null and keyWord!='' ">
+			AND 
+				(
+		 		pas_subAccType LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		pas_financialType LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		pas_adjustType LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		pas_state LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		pas_remark LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+			 	)
+		  </if> 
+		</where>
+	</select>
+</mapper>

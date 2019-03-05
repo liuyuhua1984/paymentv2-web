@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.payment.v2.web.mapper.ProviderAccountMapper">
+	<resultMap type="cn.com.payment.v2.web.model.ProviderAccount" id="providerAccountResultMap">
+		<id column="ppa_providerAccId" jdbcType="BIGINT" property="providerAccId" />
+		<result column="ppa_productId" jdbcType="BIGINT" property="productId" />
+		<result column="ppa_accName" jdbcType="VARCHAR" property="accName" />
+		<result column="ppa_providerMchNo" jdbcType="VARCHAR" property="providerMchNo" />
+		<result column="ppa_providerMchKey" jdbcType="VARCHAR" property="providerMchKey" />
+		<result column="ppa_providerAPPId" jdbcType="VARCHAR" property="providerAPPId" />
+		<result column="ppa_providerRSAKey" jdbcType="VARCHAR" property="providerRSAKey" />
+		<result column="ppa_state" jdbcType="VARCHAR" property="state" />
+		<result column="ppa_totleAmtLimit" jdbcType="BIGINT" property="totleAmtLimit" />
+		<result column="ppa_minAmt" jdbcType="BIGINT" property="minAmt" />
+		<result column="ppa_maxAmt" jdbcType="BIGINT" property="maxAmt" />
+		<result column="ppa_beginTime" jdbcType="TIMESTAMP" property="beginTime" />
+		<result column="ppa_endTime" jdbcType="TIMESTAMP" property="endTime" />
+		<result column="ppa_restrictState" jdbcType="VARCHAR" property="restrictState" />
+		<result column="ppa_percentage" jdbcType="INTEGER" property="percentage" />
+		<result column="ppa_feeRate" jdbcType="INTEGER" property="feeRate" />
+		<result column="ppa_createTime" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="ppa_updateTime" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="ppa_isDel" jdbcType="VARCHAR" property="isDel" />
+	</resultMap>
+	
+	<insert id="save" parameterType="ProviderAccount" useGeneratedKeys="true" keyProperty="providerAccId">
+	  INSERT INTO pay_provider_account
+	  (ppa_productId,ppa_accName,ppa_providerMchNo,ppa_providerMchKey,ppa_providerAPPId,ppa_providerRSAKey,ppa_state,ppa_totleAmtLimit,ppa_minAmt,ppa_maxAmt,ppa_beginTime,ppa_endTime,ppa_restrictState,ppa_percentage,ppa_feeRate,ppa_createTime,ppa_updateTime,ppa_isDel)
+	  VALUES 
+	  (#{productId},#{accName},#{providerMchNo},#{providerMchKey},#{providerAPPId},#{providerRSAKey},#{state},#{totleAmtLimit},#{minAmt},#{maxAmt},#{beginTime},#{endTime},#{restrictState},#{percentage},#{feeRate},#{createTime},#{updateTime},#{isDel})
+	</insert>
+
+	<insert id="insertBatch" parameterType="ProviderAccount">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO
+		pay_provider_account
+		(ppa_productId,ppa_accName,ppa_providerMchNo,ppa_providerMchKey,ppa_providerAPPId,ppa_providerRSAKey,ppa_state,ppa_totleAmtLimit,ppa_minAmt,ppa_maxAmt,ppa_beginTime,ppa_endTime,ppa_restrictState,ppa_percentage,ppa_feeRate,ppa_createTime,ppa_updateTime,ppa_isDel)
+		SELECT *
+		FROM (
+		<foreach collection="list" item="providerAccount" index="index"
+			open="" close="" separator="union all">
+			SELECT
+					 #{productId} as ppa_productId,
+					 #{accName} as ppa_accName,
+					 #{providerMchNo} as ppa_providerMchNo,
+					 #{providerMchKey} as ppa_providerMchKey,
+					 #{providerAPPId} as ppa_providerAPPId,
+					 #{providerRSAKey} as ppa_providerRSAKey,
+					 #{state} as ppa_state,
+					 #{totleAmtLimit} as ppa_totleAmtLimit,
+					 #{minAmt} as ppa_minAmt,
+					 #{maxAmt} as ppa_maxAmt,
+					 #{beginTime} as ppa_beginTime,
+					 #{endTime} as ppa_endTime,
+					 #{restrictState} as ppa_restrictState,
+					 #{percentage} as ppa_percentage,
+					 #{feeRate} as ppa_feeRate,
+					 #{createTime} as ppa_createTime,
+					 #{updateTime} as ppa_updateTime,
+					 #{isDel} as ppa_isDel
+			FROM DUAL
+		</foreach>
+		) A
+	</insert>
+
+	
+	<update id="update" parameterType="ProviderAccount">
+		UPDATE pay_provider_account
+		<set>
+		  <if test="providerAccId !=null and providerAccId >= 0 "> 
+			 ppa_providerAccId = #{providerAccId},
+	      </if>
+		  <if test="productId !=null and productId >= 0 "> 
+			 ppa_productId = #{productId},
+	      </if>
+		  <if test="accName !=null and accName!='' ">
+			 ppa_accName=#{accName},  
+		  </if> 
+		  <if test="providerMchNo !=null and providerMchNo!='' ">
+			 ppa_providerMchNo=#{providerMchNo},  
+		  </if> 
+		  <if test="providerMchKey !=null and providerMchKey!='' ">
+			 ppa_providerMchKey=#{providerMchKey},  
+		  </if> 
+		  <if test="providerAPPId !=null and providerAPPId!='' ">
+			 ppa_providerAPPId=#{providerAPPId},  
+		  </if> 
+		  <if test="providerRSAKey !=null and providerRSAKey!='' ">
+			 ppa_providerRSAKey=#{providerRSAKey},  
+		  </if> 
+		  <if test="state !=null and state!='' ">
+			 ppa_state=#{state},  
+		  </if> 
+		  <if test="totleAmtLimit !=null and totleAmtLimit >= 0 "> 
+			 ppa_totleAmtLimit = #{totleAmtLimit},
+	      </if>
+		  <if test="minAmt !=null and minAmt >= 0 "> 
+			 ppa_minAmt = #{minAmt},
+	      </if>
+		  <if test="maxAmt !=null and maxAmt >= 0 "> 
+			 ppa_maxAmt = #{maxAmt},
+	      </if>
+		  <if test="beginTime !=null and beginTime!='' ">
+			 ppa_beginTime=#{beginTime},  
+		  </if> 
+		  <if test="endTime !=null and endTime!='' ">
+			 ppa_endTime=#{endTime},  
+		  </if> 
+		  <if test="restrictState !=null and restrictState!='' ">
+			 ppa_restrictState=#{restrictState},  
+		  </if> 
+		  <if test="percentage !=null and percentage!='' ">
+			 ppa_percentage=#{percentage},  
+		  </if> 
+		  <if test="feeRate !=null and feeRate!='' ">
+			 ppa_feeRate=#{feeRate},  
+		  </if> 
+		  <if test="createTime !=null and createTime!='' ">
+			 ppa_createTime=#{createTime},  
+		  </if> 
+		  <if test="updateTime !=null and updateTime!='' ">
+			 ppa_updateTime=#{updateTime},  
+		  </if> 
+		  <if test="isDel !=null and isDel!='' ">
+			 ppa_isDel=#{isDel}  
+		  </if> 
+		</set>
+		WHERE ppa_providerAccId = #{providerAccId}
+	</update>
+
+	<delete id="deleteByPK">
+		DELETE FROM pay_provider_account WHERE ppa_providerAccId = #{providerAccId}
+	</delete>
+
+
+	<delete id="deleteByPKs" parameterType="java.util.ArrayList">
+	  DELETE FROM pay_provider_account WHERE ppa_providerAccId IN
+		<foreach collection="array" item="providerAccId" open="(" separator="," close=")">
+			 #{providerAccId}
+		</foreach>
+	</delete>
+	
+	<delete id="delete" parameterType="ProviderAccount"> 
+		DELETE FROM pay_provider_account WHERE ppa_providerAccId = #{providerAccId}
+	</delete>
+	
+	<select id="exists" parameterType="java.lang.Long" resultType="boolean">
+		select count(*) from pay_provider_account where ppa_providerAccId = #{providerAccId}
+	</select>
+	
+	<select id="selectOne" parameterType="java.lang.Long" resultMap="providerAccountResultMap">
+		select * from pay_provider_account
+		where ppa_providerAccId = #{providerAccId}
+	</select>
+	
+	<select id="selectAll" resultMap="providerAccountResultMap">
+		select * from pay_provider_account
+	</select>
+	
+	<select id="selectByPKs" parameterType="java.util.ArrayList" resultMap="providerAccountResultMap">
+		select * from pay_provider_account
+		where ppa_providerAccId in
+		<foreach collection="array" item="providerAccId" open="(" separator="," close=")">
+			 #{providerAccId}
+		</foreach>
+	</select>
+	
+	<select id="selectByProperty" parameterType="ProviderAccount" resultMap="providerAccountResultMap">
+	  SELECT * FROM pay_provider_account 
+		<where>
+		  <if test="providerAccId !=null and providerAccId >= 0 ">
+			 ppa_providerAccId=#{providerAccId}  
+		  </if> 
+		  <if test="productId !=null and productId >= 0 ">
+			AND ppa_productId=#{productId} 
+		  </if> 
+	      <if test="accName !=null and accName!='' ">
+			AND ppa_accName=#{accName}  
+		  </if> 
+	      <if test="providerMchNo !=null and providerMchNo!='' ">
+			AND ppa_providerMchNo=#{providerMchNo}  
+		  </if> 
+	      <if test="providerMchKey !=null and providerMchKey!='' ">
+			AND ppa_providerMchKey=#{providerMchKey}  
+		  </if> 
+	      <if test="providerAPPId !=null and providerAPPId!='' ">
+			AND ppa_providerAPPId=#{providerAPPId}  
+		  </if> 
+	      <if test="providerRSAKey !=null and providerRSAKey!='' ">
+			AND ppa_providerRSAKey=#{providerRSAKey}  
+		  </if> 
+	      <if test="state !=null and state!='' ">
+			AND ppa_state=#{state}  
+		  </if> 
+		  <if test="totleAmtLimit !=null and totleAmtLimit >= 0 ">
+			AND ppa_totleAmtLimit=#{totleAmtLimit} 
+		  </if> 
+		  <if test="minAmt !=null and minAmt >= 0 ">
+			AND ppa_minAmt=#{minAmt} 
+		  </if> 
+		  <if test="maxAmt !=null and maxAmt >= 0 ">
+			AND ppa_maxAmt=#{maxAmt} 
+		  </if> 
+	      <if test="beginTime !=null and beginTime!='' ">
+			AND ppa_beginTime=#{beginTime}  
+		  </if> 
+	      <if test="endTime !=null and endTime!='' ">
+			AND ppa_endTime=#{endTime}  
+		  </if> 
+	      <if test="restrictState !=null and restrictState!='' ">
+			AND ppa_restrictState=#{restrictState}  
+		  </if> 
+	      <if test="percentage !=null and percentage!='' ">
+			AND ppa_percentage=#{percentage}  
+		  </if> 
+	      <if test="feeRate !=null and feeRate!='' ">
+			AND ppa_feeRate=#{feeRate}  
+		  </if> 
+	      <if test="createTime !=null and createTime!='' ">
+			AND ppa_createTime=#{createTime}  
+		  </if> 
+	      <if test="updateTime !=null and updateTime!='' ">
+			AND ppa_updateTime=#{updateTime}  
+		  </if> 
+	      <if test="isDel !=null and isDel!='' ">
+			AND ppa_isDel=#{isDel}  
+		  </if> 
+		</where>
+	</select>
+	<select id="selectByPropertyKeyWord" parameterType="ProviderAccount" resultMap="providerAccountResultMap">
+	  SELECT * FROM pay_provider_account 
+		<where>
+		  <if test="providerAccId !=null and providerAccId >= 0 ">
+			 ppa_providerAccId=#{providerAccId}  
+		  </if> 
+		  <if test="productId !=null and productId >= 0 ">
+			AND ppa_productId=#{productId} 
+		  </if> 
+	      <if test="accName !=null and accName!='' ">
+			AND ppa_accName=#{accName}  
+		  </if> 
+	      <if test="providerMchNo !=null and providerMchNo!='' ">
+			AND ppa_providerMchNo=#{providerMchNo}  
+		  </if> 
+	      <if test="providerMchKey !=null and providerMchKey!='' ">
+			AND ppa_providerMchKey=#{providerMchKey}  
+		  </if> 
+	      <if test="providerAPPId !=null and providerAPPId!='' ">
+			AND ppa_providerAPPId=#{providerAPPId}  
+		  </if> 
+	      <if test="providerRSAKey !=null and providerRSAKey!='' ">
+			AND ppa_providerRSAKey=#{providerRSAKey}  
+		  </if> 
+	      <if test="state !=null and state!='' ">
+			AND ppa_state=#{state}  
+		  </if> 
+		  <if test="totleAmtLimit !=null and totleAmtLimit >= 0 ">
+			AND ppa_totleAmtLimit=#{totleAmtLimit} 
+		  </if> 
+		  <if test="minAmt !=null and minAmt >= 0 ">
+			AND ppa_minAmt=#{minAmt} 
+		  </if> 
+		  <if test="maxAmt !=null and maxAmt >= 0 ">
+			AND ppa_maxAmt=#{maxAmt} 
+		  </if> 
+	      <if test="beginTime !=null and beginTime!='' ">
+			AND ppa_beginTime=#{beginTime}  
+		  </if> 
+	      <if test="endTime !=null and endTime!='' ">
+			AND ppa_endTime=#{endTime}  
+		  </if> 
+	      <if test="restrictState !=null and restrictState!='' ">
+			AND ppa_restrictState=#{restrictState}  
+		  </if> 
+	      <if test="percentage !=null and percentage!='' ">
+			AND ppa_percentage=#{percentage}  
+		  </if> 
+	      <if test="feeRate !=null and feeRate!='' ">
+			AND ppa_feeRate=#{feeRate}  
+		  </if> 
+	      <if test="createTime !=null and createTime!='' ">
+			AND ppa_createTime=#{createTime}  
+		  </if> 
+	      <if test="updateTime !=null and updateTime!='' ">
+			AND ppa_updateTime=#{updateTime}  
+		  </if> 
+	      <if test="isDel !=null and isDel!='' ">
+			AND ppa_isDel=#{isDel}  
+		  </if> 
+		  <if test="keyWord !=null and keyWord!='' ">
+			AND 
+				(
+		 		ppa_accName LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_providerMchNo LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_providerMchKey LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_providerAPPId LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_providerRSAKey LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_state LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_restrictState LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		ppa_isDel LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 
+			 	)
+		  </if> 
+		</where>
+	</select>
+</mapper>

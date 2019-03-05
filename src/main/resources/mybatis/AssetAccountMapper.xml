@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.payment.v2.web.mapper.AssetAccountMapper">
+	<resultMap type="cn.com.payment.v2.web.model.AssetAccount" id="assetAccountResultMap">
+		<id column="paa_accountId" jdbcType="BIGINT" property="accountId" />
+		<result column="paa_accType" jdbcType="VARCHAR" property="accType" />
+		<result column="paa_balance" jdbcType="BIGINT" property="balance" />
+		<result column="paa_balanceUnaccounted" jdbcType="BIGINT" property="balanceUnaccounted" />
+		<result column="paa_balanceFreeze" jdbcType="BIGINT" property="balanceFreeze" />
+		<result column="paa_balanceValid" jdbcType="BIGINT" property="balanceValid" />
+		<result column="paa_createTime" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="paa_updateTime" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="paa_remark" jdbcType="VARCHAR" property="remark" />
+		<result column="paa_isDel" jdbcType="VARCHAR" property="isDel" />
+	</resultMap>
+	
+	<insert id="save" parameterType="AssetAccount" useGeneratedKeys="true" keyProperty="accountId">
+	  INSERT INTO pay_asset_account
+	  (paa_accType,paa_balance,paa_balanceUnaccounted,paa_balanceFreeze,paa_balanceValid,paa_createTime,paa_updateTime,paa_remark,paa_isDel)
+	  VALUES 
+	  (#{accType},#{balance},#{balanceUnaccounted},#{balanceFreeze},#{balanceValid},#{createTime},#{updateTime},#{remark},#{isDel})
+	</insert>
+
+	<insert id="insertBatch" parameterType="AssetAccount">
+		<selectKey resultType="java.lang.Integer" keyProperty="id"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO
+		pay_asset_account
+		(paa_accType,paa_balance,paa_balanceUnaccounted,paa_balanceFreeze,paa_balanceValid,paa_createTime,paa_updateTime,paa_remark,paa_isDel)
+		SELECT *
+		FROM (
+		<foreach collection="list" item="assetAccount" index="index"
+			open="" close="" separator="union all">
+			SELECT
+					 #{accType} as paa_accType,
+					 #{balance} as paa_balance,
+					 #{balanceUnaccounted} as paa_balanceUnaccounted,
+					 #{balanceFreeze} as paa_balanceFreeze,
+					 #{balanceValid} as paa_balanceValid,
+					 #{createTime} as paa_createTime,
+					 #{updateTime} as paa_updateTime,
+					 #{remark} as paa_remark,
+					 #{isDel} as paa_isDel
+			FROM DUAL
+		</foreach>
+		) A
+	</insert>
+
+	
+	<update id="update" parameterType="AssetAccount">
+		UPDATE pay_asset_account
+		<set>
+		  <if test="accountId !=null and accountId >= 0 "> 
+			 paa_accountId = #{accountId},
+	      </if>
+		  <if test="accType !=null and accType!='' ">
+			 paa_accType=#{accType},  
+		  </if> 
+		  <if test="balance !=null and balance >= 0 "> 
+			 paa_balance = #{balance},
+	      </if>
+		  <if test="balanceUnaccounted !=null and balanceUnaccounted >= 0 "> 
+			 paa_balanceUnaccounted = #{balanceUnaccounted},
+	      </if>
+		  <if test="balanceFreeze !=null and balanceFreeze >= 0 "> 
+			 paa_balanceFreeze = #{balanceFreeze},
+	      </if>
+		  <if test="balanceValid !=null and balanceValid >= 0 "> 
+			 paa_balanceValid = #{balanceValid},
+	      </if>
+		  <if test="createTime !=null and createTime!='' ">
+			 paa_createTime=#{createTime},  
+		  </if> 
+		  <if test="updateTime !=null and updateTime!='' ">
+			 paa_updateTime=#{updateTime},  
+		  </if> 
+		  <if test="remark !=null and remark!='' ">
+			 paa_remark=#{remark},  
+		  </if> 
+		  <if test="isDel !=null and isDel!='' ">
+			 paa_isDel=#{isDel}  
+		  </if> 
+		</set>
+		WHERE paa_accountId = #{accountId}
+	</update>
+
+	<delete id="deleteByPK">
+		DELETE FROM pay_asset_account WHERE paa_accountId = #{accountId}
+	</delete>
+
+
+	<delete id="deleteByPKs" parameterType="java.util.ArrayList">
+	  DELETE FROM pay_asset_account WHERE paa_accountId IN
+		<foreach collection="array" item="accountId" open="(" separator="," close=")">
+			 #{accountId}
+		</foreach>
+	</delete>
+	
+	<delete id="delete" parameterType="AssetAccount"> 
+		DELETE FROM pay_asset_account WHERE paa_accountId = #{accountId}
+	</delete>
+	
+	<select id="exists" parameterType="java.lang.Long" resultType="boolean">
+		select count(*) from pay_asset_account where paa_accountId = #{accountId}
+	</select>
+	
+	<select id="selectOne" parameterType="java.lang.Long" resultMap="assetAccountResultMap">
+		select * from pay_asset_account
+		where paa_accountId = #{accountId}
+	</select>
+	
+	<select id="selectAll" resultMap="assetAccountResultMap">
+		select * from pay_asset_account
+	</select>
+	
+	<select id="selectByPKs" parameterType="java.util.ArrayList" resultMap="assetAccountResultMap">
+		select * from pay_asset_account
+		where paa_accountId in
+		<foreach collection="array" item="accountId" open="(" separator="," close=")">
+			 #{accountId}
+		</foreach>
+	</select>
+	
+	<select id="selectByProperty" parameterType="AssetAccount" resultMap="assetAccountResultMap">
+	  SELECT * FROM pay_asset_account 
+		<where>
+		  <if test="accountId !=null and accountId >= 0 ">
+			 paa_accountId=#{accountId}  
+		  </if> 
+	      <if test="accType !=null and accType!='' ">
+			AND paa_accType=#{accType}  
+		  </if> 
+		  <if test="balance !=null and balance >= 0 ">
+			AND paa_balance=#{balance} 
+		  </if> 
+		  <if test="balanceUnaccounted !=null and balanceUnaccounted >= 0 ">
+			AND paa_balanceUnaccounted=#{balanceUnaccounted} 
+		  </if> 
+		  <if test="balanceFreeze !=null and balanceFreeze >= 0 ">
+			AND paa_balanceFreeze=#{balanceFreeze} 
+		  </if> 
+		  <if test="balanceValid !=null and balanceValid >= 0 ">
+			AND paa_balanceValid=#{balanceValid} 
+		  </if> 
+	      <if test="createTime !=null and createTime!='' ">
+			AND paa_createTime=#{createTime}  
+		  </if> 
+	      <if test="updateTime !=null and updateTime!='' ">
+			AND paa_updateTime=#{updateTime}  
+		  </if> 
+	      <if test="remark !=null and remark!='' ">
+			AND paa_remark=#{remark}  
+		  </if> 
+	      <if test="isDel !=null and isDel!='' ">
+			AND paa_isDel=#{isDel}  
+		  </if> 
+		</where>
+	</select>
+	<select id="selectByPropertyKeyWord" parameterType="AssetAccount" resultMap="assetAccountResultMap">
+	  SELECT * FROM pay_asset_account 
+		<where>
+		  <if test="accountId !=null and accountId >= 0 ">
+			 paa_accountId=#{accountId}  
+		  </if> 
+	      <if test="accType !=null and accType!='' ">
+			AND paa_accType=#{accType}  
+		  </if> 
+		  <if test="balance !=null and balance >= 0 ">
+			AND paa_balance=#{balance} 
+		  </if> 
+		  <if test="balanceUnaccounted !=null and balanceUnaccounted >= 0 ">
+			AND paa_balanceUnaccounted=#{balanceUnaccounted} 
+		  </if> 
+		  <if test="balanceFreeze !=null and balanceFreeze >= 0 ">
+			AND paa_balanceFreeze=#{balanceFreeze} 
+		  </if> 
+		  <if test="balanceValid !=null and balanceValid >= 0 ">
+			AND paa_balanceValid=#{balanceValid} 
+		  </if> 
+	      <if test="createTime !=null and createTime!='' ">
+			AND paa_createTime=#{createTime}  
+		  </if> 
+	      <if test="updateTime !=null and updateTime!='' ">
+			AND paa_updateTime=#{updateTime}  
+		  </if> 
+	      <if test="remark !=null and remark!='' ">
+			AND paa_remark=#{remark}  
+		  </if> 
+	      <if test="isDel !=null and isDel!='' ">
+			AND paa_isDel=#{isDel}  
+		  </if> 
+		  <if test="keyWord !=null and keyWord!='' ">
+			AND 
+				(
+		 		paa_accType LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		paa_remark LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 or
+		 		paa_isDel LIKE CONCAT(CONCAT('%', #{keyWord}),'%')
+				 
+			 	)
+		  </if> 
+		</where>
+	</select>
+</mapper>
